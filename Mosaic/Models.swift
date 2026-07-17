@@ -1,0 +1,43 @@
+//
+//  Models.swift
+//  Mosaic
+//
+//  Created by Gahyeon Kim on 17/7/2026.
+//
+
+import Foundation
+import SwiftUI
+import FirebaseFirestore
+
+struct User: Codable, Identifiable {
+    @DocumentID var id: String?
+    var name: String
+    var profileImage: String
+    var location: String
+    var country: String
+}
+
+struct Group: Codable, Identifiable {
+    @DocumentID var id: String?
+    var name: String
+    var description: String
+    var coverImage: String
+    var memberIds: [String]
+    
+    var memberCount: Int {memberIds.count}
+}
+
+struct Event: Codable, Identifiable {
+    @DocumentID var id: String?
+    var groupId: String
+    var title: String
+    var description: String
+    var location: String
+    var startAt : Date
+    var coverImage: String
+    var registeredUserIds: [String]
+    
+    var registeredCount: Int {registeredUserIds.count}
+}
+
+
