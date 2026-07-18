@@ -37,7 +37,8 @@ struct Event: Codable, Identifiable {
     var coverImage: String
     var registeredUserIds: [String]
     
+    var spotlight: Bool
+    var priotity: Int?
+    
     var registeredCount: Int {registeredUserIds.count}
 }
-
-
