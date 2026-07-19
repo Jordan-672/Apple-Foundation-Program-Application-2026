@@ -24,6 +24,12 @@ struct GroupService {
     func fetchGroup(id: String) async throws -> Group? {
         try await db.collection("groups").document(id).getDocument().data(as: Group.self)
     }
+
+    func joinGroup(groupId: String, userId: String) async throws {
+        try await db.collection("groups").document(groupId).updateData([
+            "memberIds": FieldValue.arrayUnion([userId])
+        ])
+    }
 }
 
 struct EventService {
@@ -40,7 +46,7 @@ struct EventService {
 
     func fetchEvents(groupId: String) async throws-> [Event] {
         let snapshot = try await db.collection("events")
-            .whereField("groupID", isEqualTo: groupId)
+            .whereField("groupId", isEqualTo: groupId)
             .order(by: "startAt")
             .getDocuments()
         return snapshot.documents.compactMap { doc in
@@ -50,6 +56,12 @@ struct EventService {
 
     func fetchEvent(id: String) async throws -> Event? {
         try await db.collection("events").document(id).getDocument().data(as: Event.self)
+    }
+
+    func registerForEvent(eventId: String, userId: String) async throws {
+        try await db.collection("events").document(eventId).updateData([
+            "registeredUserIds": FieldValue.arrayUnion([userId])
+        ])
     }
 }
 

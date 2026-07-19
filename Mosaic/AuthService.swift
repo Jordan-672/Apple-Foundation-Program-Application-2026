@@ -16,6 +16,22 @@ struct AuthService {
         return result.user.uid
     }
 
+    // Combines signUpWithEmail with createUserProfile so callers can't forget
+    // to create the Firestore profile after an email sign-up.
+    func signUpWithEmail(email: String, password: String, name: String, location: String, country: String) async throws -> String {
+        let uid = try await signUpWithEmail(email: email, password: password)
+        try await createUserProfile(uid: uid, name: name, location: location, country: country)
+        return uid
+    }
+
+    var currentUserId: String? {
+        Auth.auth().currentUser?.uid
+    }
+
+    var isLoggedIn: Bool {
+        currentUserId != nil
+    }
+
     func signInWithEmail(email: String, password: String) async throws -> String {
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
         return result.user.uid
