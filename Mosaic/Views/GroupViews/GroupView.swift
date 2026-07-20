@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GroupView: View {
     let groupId: String
-    @StateObject private var vm = GroupViewModel(groupId: "spiceyFood")
+    @StateObject private var vm = GroupViewModel()
 
     var body: some View {
         NavigationStack {

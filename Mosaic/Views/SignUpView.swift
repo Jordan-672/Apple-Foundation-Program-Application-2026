@@ -2,16 +2,10 @@
 //  SignUpView.swift
 //  Mosaic
 //
-<<<<<<< Updated upstream
 //  Created by Gahyeon Kim on 20/7/2026.
-=======
-//  Created by Jordan Joseph on 18/7/2026.
->>>>>>> Stashed changes
-//
 
 import SwiftUI
 
-<<<<<<< Updated upstream
 private struct PasswordField: View {
     let title: String
     @Binding var text: String
@@ -59,7 +53,7 @@ struct SignUpView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.dismiss) private var dismiss
     @StateObject private var locationManager = LocationManager()
-
+    
     @State private var firstName = ""
     @State private var lastName = ""
     @State private var email = ""
@@ -69,10 +63,10 @@ struct SignUpView: View {
     @State private var showCountryPicker = false
     @State private var isFetchingLocation = false
     @State private var locationErrorMessage: String?
-
+    
     private var isEmailValid: Bool {
         email.contains("@") && email.split(separator: "@").count == 2
-            && (email.split(separator: "@").last?.contains(".") ?? false)
+        && (email.split(separator: "@").last?.contains(".") ?? false)
     }
     private var hasMinLength: Bool { password.count >= 8 }
     private var hasLetter: Bool { password.contains(where: \.isLetter) }
@@ -80,11 +74,11 @@ struct SignUpView: View {
     private var passwordMeetsRequirements: Bool { hasMinLength && hasLetter && hasNumber }
     private var canSubmit: Bool {
         !firstName.isEmpty && !lastName.isEmpty && isEmailValid
-            && passwordMeetsRequirements
-            && !location.isEmpty && !country.isEmpty
-            && !authViewModel.isLoading
+        && passwordMeetsRequirements
+        && !location.isEmpty && !country.isEmpty
+        && !authViewModel.isLoading
     }
-
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -97,7 +91,7 @@ struct SignUpView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
-
+                    
                     PasswordField(title: "Password", text: $password)
                     if !password.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
@@ -108,11 +102,11 @@ struct SignUpView: View {
                         .padding(.vertical, 2)
                     }
                 }
-
+                
                 Section("Profile") {
                     TextField("First Name", text: $firstName)
                     TextField("Last Name", text: $lastName)
-
+                    
                     HStack {
                         Text(location.isEmpty ? "Location not set" : location)
                             .foregroundStyle(location.isEmpty ? .secondary : .primary)
@@ -143,7 +137,7 @@ struct SignUpView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
-
+                    
                     Button {
                         showCountryPicker = true
                     } label: {
@@ -156,13 +150,13 @@ struct SignUpView: View {
                         }
                     }
                 }
-
+                
                 if let error = authViewModel.errorMessage {
                     Text(error)
                         .foregroundStyle(.red)
                         .font(.footnote)
                 }
-
+                
                 Button {
                     Task {
                         await authViewModel.signUp(email: email, password: password, firstName: firstName, lastName: lastName, location: location, country: country)
@@ -189,18 +183,10 @@ struct SignUpView: View {
                 CountryPicker(selectedCountry: $country)
             }
         }
-=======
-struct SignUpView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
->>>>>>> Stashed changes
     }
 }
 
 #Preview {
     SignUpView()
-<<<<<<< Updated upstream
         .environmentObject(AuthViewModel())
-=======
->>>>>>> Stashed changes
 }
