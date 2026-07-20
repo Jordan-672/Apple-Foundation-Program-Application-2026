@@ -2,12 +2,17 @@
 //  SignInView.swift
 //  Mosaic
 //
+<<<<<<< Updated upstream
 //  Created by Gahyeon Kim on 20/7/2026.
+=======
+//  Created by Jordan Joseph on 18/7/2026.
+>>>>>>> Stashed changes
 //
 
 import SwiftUI
 
 struct SignInView: View {
+<<<<<<< Updated upstream
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var email = ""
     @State private var password = ""
@@ -66,10 +71,17 @@ struct SignInView: View {
             SignUpView()
                 .environmentObject(authViewModel)
         }
+=======
+    var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+>>>>>>> Stashed changes
     }
 }
 
 #Preview {
     SignInView()
+<<<<<<< Updated upstream
         .environmentObject(AuthViewModel())
+=======
+>>>>>>> Stashed changes
 }

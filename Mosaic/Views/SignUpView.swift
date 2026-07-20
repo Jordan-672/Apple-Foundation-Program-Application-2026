@@ -2,11 +2,16 @@
 //  SignUpView.swift
 //  Mosaic
 //
+<<<<<<< Updated upstream
 //  Created by Gahyeon Kim on 20/7/2026.
+=======
+//  Created by Jordan Joseph on 18/7/2026.
+>>>>>>> Stashed changes
 //
 
 import SwiftUI
 
+<<<<<<< Updated upstream
 private struct PasswordField: View {
     let title: String
     @Binding var text: String
@@ -184,10 +189,18 @@ struct SignUpView: View {
                 CountryPicker(selectedCountry: $country)
             }
         }
+=======
+struct SignUpView: View {
+    var body: some View {
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+>>>>>>> Stashed changes
     }
 }
 
 #Preview {
     SignUpView()
+<<<<<<< Updated upstream
         .environmentObject(AuthViewModel())
+=======
+>>>>>>> Stashed changes
 }

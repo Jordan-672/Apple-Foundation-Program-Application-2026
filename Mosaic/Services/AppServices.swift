@@ -1,12 +1,9 @@
 //
-//  Services.swift
+//  AppServices.swift
 //  Mosaic
 //
 //  Created by Gahyeon Kim on 17/7/2026.
 //
-
-// This file provides data-fetching functions for Group, Event, and User.
-// Right now each function returns hardcoded sample data
 
 import Foundation
 import FirebaseFirestore

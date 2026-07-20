@@ -1,0 +1,226 @@
+{
+  "users": {
+    "MssY6q4Q3pMsnfFR73CjDVryKvj1": {
+      "name": "Anh Nguyen",
+      "profileImage": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+      "location": "Northbridge, Perth",
+      "country": "Vietnam"
+    },
+    "HmPl77yV3bf8XzyTqeWmEeTjBRi1": {
+      "name": "Raj Patel",
+      "profileImage": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39",
+      "location": "Mirrabooka, Perth",
+      "country": "India"
+    },
+    "zAkqGSh6ePOsJOn7I6RzHgs4LXH3": {
+      "name": "Marco Rossi",
+      "profileImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+      "location": "Fremantle, Perth",
+      "country": "Italy"
+    },
+    "2SmAom7g9oMSZ5YEi5FeIq83LtZ2": {
+      "name": "Fatima Rahman",
+      "profileImage": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+      "location": "Victoria Park, Perth",
+      "country": "Bangladesh"
+    },
+    "YF99jSrsMUaU5V5IjXu9kByYPwS2": {
+      "name": "Minsu Kim",
+      "profileImage": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+      "location": "Malaga, Perth",
+      "country": "South Korea"
+    }
+  },
+
+  "groups": {
+    "spicyFood": {
+      "name": "Spicy Food Community",
+      "description": "For lovers of chili, heat, and bold flavours.",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "memberIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1",
+        "2SmAom7g9oMSZ5YEi5FeIq83LtZ2"
+      ]
+    },
+    "thaiCuisine": {
+      "name": "Thai Food Community",
+      "description": "Exploring Thai street food, curries, and desserts.",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "memberIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "zAkqGSh6ePOsJOn7I6RzHgs4LXH3"
+      ]
+    },
+    "koreanBBQ": {
+      "name": "Korean BBQ Crew",
+      "description": "Samgyeopsal nights, soju, and grilling culture.",
+      "coverImage": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+      "memberIds": [
+        "YF99jSrsMUaU5V5IjXu9kByYPwS2",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1"
+      ]
+    },
+    "curryFans": {
+      "name": "Curry Lovers Club",
+      "description": "Indian, Bangladeshi, Sri Lankan, Malaysian curry exploration.",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "memberIds": [
+        "2SmAom7g9oMSZ5YEi5FeIq83LtZ2",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1",
+        "zAkqGSh6ePOsJOn7I6RzHgs4LXH3"
+      ]
+    },
+    "ramenSociety": {
+      "name": "Japanese Ramen Society",
+      "description": "Exploring rich broths, noodles, and authentic Japanese ramen culture.",
+      "coverImage": "https://images.unsplash.com/photo-1543353071-087092ec393e",
+      "memberIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "YF99jSrsMUaU5V5IjXu9kByYPwS2"
+      ]
+    }
+  },
+
+  "events": {
+    "spicy1": {
+      "groupId": "spicyFood",
+      "title": "Perth Chili Festival",
+      "description": "Taste the hottest sauces in WA.",
+      "location": "Perth Cultural Centre",
+      "startAt": "2026-08-12T18:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1"
+      ],
+      "spotlight": true,
+      "priority": 1
+    },
+    "spicy2": {
+      "groupId": "spicyFood",
+      "title": "Ghost Pepper Challenge",
+      "description": "Try the infamous ghost pepper wings.",
+      "location": "Northbridge",
+      "startAt": "2026-08-20T19:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "2SmAom7g9oMSZ5YEi5FeIq83LtZ2"
+      ],
+      "spotlight": false
+    },
+    "spicy3": {
+      "groupId": "spicyFood",
+      "title": "Spicy Ramen Night",
+      "description": "Level 1–10 ramen heat challenge.",
+      "location": "Perth CBD",
+      "startAt": "2026-08-25T18:30:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1",
+        "2SmAom7g9oMSZ5YEi5FeIq83LtZ2"
+      ],
+      "spotlight": true,
+      "priority": 2
+    },
+
+    "thai1": {
+      "groupId": "thaiCuisine",
+      "title": "Thai Street Food Night",
+      "description": "Pad Thai, Som Tum, Mango Sticky Rice.",
+      "location": "Fremantle Markets",
+      "startAt": "2026-08-10T17:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "zAkqGSh6ePOsJOn7I6RzHgs4LXH3"
+      ],
+      "spotlight": true,
+      "priority": 3
+    },
+    "thai2": {
+      "groupId": "thaiCuisine",
+      "title": "Green Curry Cook-Off",
+      "description": "Compete for the best homemade curry.",
+      "location": "Perth CBD",
+      "startAt": "2026-08-22T18:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "zAkqGSh6ePOsJOn7I6RzHgs4LXH3"
+      ],
+      "spotlight": false
+    },
+
+    "kbbq1": {
+      "groupId": "koreanBBQ",
+      "title": "Samgyeopsal Night",
+      "description": "Pork belly grilling with soju.",
+      "location": "East Perth",
+      "startAt": "2026-08-15T19:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+      "registeredUserIds": [
+        "YF99jSrsMUaU5V5IjXu9kByYPwS2",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1"
+      ],
+      "spotlight": true,
+      "priority": 4
+    },
+    "kbbq2": {
+      "groupId": "koreanBBQ",
+      "title": "Korean Fried Chicken Party",
+      "description": "Honey butter, spicy, soy garlic flavours.",
+      "location": "Northbridge",
+      "startAt": "2026-08-28T20:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+      "registeredUserIds": [
+        "YF99jSrsMUaU5V5IjXu9kByYPwS2"
+      ],
+      "spotlight": false
+    },
+
+    "curry1": {
+      "groupId": "curryFans",
+      "title": "Biryani Cook-Off",
+      "description": "Hyderabadi vs Bangladeshi vs Pakistani styles.",
+      "location": "Victoria Park",
+      "startAt": "2026-08-18T18:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "2SmAom7g9oMSZ5YEi5FeIq83LtZ2",
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1",
+        "zAkqGSh6ePOsJOn7I6RzHgs4LXH3"
+      ],
+      "spotlight": true,
+      "priority": 5
+    },
+    "curry2": {
+      "groupId": "curryFans",
+      "title": "Butter Chicken Night",
+      "description": "Taste test 5 restaurants in one evening.",
+      "location": "Perth CBD",
+      "startAt": "2026-08-30T18:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1604908177522-402d8f0f7f1d",
+      "registeredUserIds": [
+        "HmPl77yV3bf8XzyTqeWmEeTjBRi1"
+      ],
+      "spotlight": false
+    },
+
+    "ramen1": {
+      "groupId": "ramenSociety",
+      "title": "Tonkotsu Ramen Night",
+      "description": "Rich pork broth with handmade noodles.",
+      "location": "Perth CBD",
+      "startAt": "2026-08-14T18:00:00Z",
+      "coverImage": "https://images.unsplash.com/photo-1543353071-087092ec393e",
+      "registeredUserIds": [
+        "MssY6q4Q3pMsnfFR73CjDVryKvj1",
+        "YF99jSrsMUaU5V5IjXu9kByYPwS2"
+      ],
+      "spotlight": true,
+      "priority": 6
+    }
+  }
+}
+
