@@ -11,7 +11,8 @@ import FirebaseFirestore
 
 struct User: Codable, Identifiable {
     @DocumentID var id: String?
-    var name: String
+    var firstName: String
+    var lastName: String
     var profileImage: String
     var location: String
     var country: String

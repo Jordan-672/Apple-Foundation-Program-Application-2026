@@ -8,12 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var authViewModel = AuthViewModel()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .foregroundStyle(Color.blue)
-            Text("Hello, World!")
+        SwiftUI.Group {
+            if authViewModel.isLoggedIn {
+                NavigationStack {
+                    HomeView()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button("Logout") {
+                                    authViewModel.signOut()
+                                }
+                            }
+                        }
+                }
+            } else {
+                SignInView()
+            }
         }
+        .environmentObject(authViewModel)
     }
 }
 
