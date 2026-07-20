@@ -78,4 +78,15 @@ struct AuthService {
         let user = User(id: uid, firstName: firstName, lastName: lastName, profileImage: "", location: location, country: country)
         try Firestore.firestore().collection("users").document(uid).setData(from: user)
     }
+
+    // Used to fill in location/country after the fact, e.g. once a Google
+    // sign-up user picks them on the CompleteProfileView screen. Uses merge
+    // instead of updateData so this still works even if the profile
+    // document doesn't exist yet (updateData throws in that case).
+    func updateUserLocationCountry(uid: String, location: String, country: String) async throws {
+        try await Firestore.firestore().collection("users").document(uid).setData([
+            "location": location,
+            "country": country
+        ], merge: true)
+    }
 }

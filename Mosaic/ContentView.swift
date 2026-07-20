@@ -12,7 +12,11 @@ struct ContentView: View {
 
     var body: some View {
         SwiftUI.Group {
-            if authViewModel.isLoggedIn {
+            if !authViewModel.isLoggedIn {
+                SignInView()
+            } else if authViewModel.needsProfileCompletion {
+                CompleteProfileView()
+            } else {
                 NavigationStack {
                     HomeView()
                         .toolbar {
@@ -23,8 +27,6 @@ struct ContentView: View {
                             }
                         }
                 }
-            } else {
-                SignInView()
             }
         }
         .environmentObject(authViewModel)

@@ -14,6 +14,10 @@ struct MosaicApp: App {
 
     init() {
         FirebaseApp.configure()
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            fatalError("Missing Firebase clientID — check GoogleService-Info.plist")
+        }
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
     }
 
     var body: some Scene {
