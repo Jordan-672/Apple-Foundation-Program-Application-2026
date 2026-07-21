@@ -18,12 +18,13 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            SwiftUI.Group {
                 if isLoading {
                     ProgressView("Loading profile...")
-                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let user = user {
-                    VStack(spacing: 24) {
+                    ScrollView {
+                    VStack(spacing: 16) {
                         // Profile Header
                         HStack(alignment: .top, spacing: 16) {
                             // Profile Image
@@ -57,45 +58,47 @@ struct ProfileView: View {
                                     Image(systemName: "location.fill")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
-                                    Text("\(user.location), \(user.country)")
+                                    Text(user.location)
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                 }
 
                                 // Joined date
                                 if let createdAt = authViewModel.accountCreatedAt {
-                                    Text("Joined \(createdAt.formatted(date: .abbreviated, time: .omitted))")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                        Image(systemName: "calendar")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        Text("Joined \(createdAt.formatted(date: .abbreviated, time: .omitted))")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
 
                             Spacer()
                         }
-                        .padding(.horizontal)
-                        .padding(.top, 20)
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(16)
 
-                        Divider()
-                            .padding(.horizontal)
-                        
                         // Profile Information Section
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Profile Information")
                                 .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 12) {
-                                ProfileInfoRow(icon: "person.fill", title: "First Name", value: user.firstName)
-                                ProfileInfoRow(icon: "person.fill", title: "Last Name", value: user.lastName)
+
+                            VStack(spacing: 4) {
+                                ProfileInfoRow(icon: "person.fill", title: "Name", value: "\(user.firstName) \(user.lastName)")
+                                Divider()
                                 ProfileInfoRow(icon: "mappin.and.ellipse", title: "Location", value: user.location)
+                                Divider()
                                 ProfileInfoRow(icon: "globe", title: "Country", value: user.country)
                             }
-                            .padding(.horizontal)
                         }
-                        
-                        Divider()
-                            .padding(.horizontal)
-                        
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(16)
+
                         // Action Buttons
                         VStack(spacing: 12) {
                             Button {
@@ -111,7 +114,7 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                             }
-                            
+
                             Button(role: .destructive) {
                                 authViewModel.signOut()
                             } label: {
@@ -126,8 +129,11 @@ struct ProfileView: View {
                                 .cornerRadius(12)
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+                    }
+                    .padding()
+                    }
+                    .refreshable {
+                        await loadUserProfile()
                     }
                 } else if !authViewModel.isLoggedIn {
                     VStack(spacing: 16) {
@@ -138,7 +144,7 @@ struct ProfileView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     VStack(spacing: 16) {
                         Image(systemName: "person.crop.circle.badge.xmark")
@@ -163,13 +169,12 @@ struct ProfileView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Profile")
-            .refreshable {
-                await loadUserProfile()
-            }
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showEditSheet) {
                 if let user = user {
                     EditProfileView(user: user) { updatedFirstName, updatedLastName, updatedCountry in
@@ -235,12 +240,10 @@ struct ProfileInfoRow: View {
                 Text(value)
                     .font(.body)
             }
-            
+
             Spacer()
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
+        .padding(.vertical, 6)
     }
 }
 

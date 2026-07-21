@@ -13,7 +13,7 @@ import Observation
 class HomeViewModel {
     var groups: [Group] = []
     var spotlights: [Event] = []
-    var isLoading = false
+    var isLoading = true
     var errorMessage: String?
     
     private let groupService = GroupService()

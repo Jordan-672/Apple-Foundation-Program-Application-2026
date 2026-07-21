@@ -11,41 +11,61 @@ struct GroupView: View {
             if vm.isLoading {
                 ProgressView("Loading group...")
             } else if let group = vm.group {
-                VStack {
+                VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(group.name)
-                            .font(.system(size: 26, weight: .bold))
+                            .font(.system(size: 20, weight: .bold))
                             .fixedSize(horizontal: false, vertical: true)
 
                         Text(group.description)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(.secondary)
 
                         AsyncImage(url: URL(string: group.coverImage)) { image in
-                            image.resizable().scaledToFit()
+                            image.resizable().scaledToFill()
                         } placeholder: {
                             ProgressView()
                         }
                         .frame(height: 160)
                         .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .padding(16)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
                     }
+                    .padding(16)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(16)
                     .padding(.horizontal)
                     .padding(.top, 8)
                     .navigationTitle(group.name)
                     .navigationBarTitleDisplayMode(.inline)
 
                     List {
-                        ForEach(vm.events) { event in
-                            NavigationLink(destination: EventDetailsView(event: event)) {
-                                VStack(alignment: .leading) {
-                                    Text(event.title)
-                                        .fontWeight(.bold)
+                        Section("Events") {
+                            ForEach(vm.events) { event in
+                                NavigationLink(destination: EventDetailsView(event: event)) {
+                                    HStack(spacing: 12) {
+                                        AsyncImage(url: URL(string: event.coverImage)) { image in
+                                            image.resizable().scaledToFill()
+                                        } placeholder: {
+                                            Image(systemName: "photo")
+                                                .foregroundColor(.gray)
+                                        }
+                                        .frame(width: 56, height: 56)
+                                        .clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                                    HStack {
-                                        Text(event.location)
-                                        Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(event.title)
+                                                .fontWeight(.bold)
+                                            
+                                            Text(event.location)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+
+                                            Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
                                     }
                                 }
                             }
@@ -107,6 +127,7 @@ struct GroupView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 8)
                 }
+                .background(Color(.systemGroupedBackground))
             } else {
                 Text("Group not found.")
             }

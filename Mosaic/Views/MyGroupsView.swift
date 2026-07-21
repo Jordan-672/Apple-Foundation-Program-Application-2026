@@ -23,11 +23,14 @@ struct MyGroupsView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if vm.isLoading {
                     ProgressView("Loading your groups...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if vm.groups.isEmpty {
                     Text("You haven't joined any groups yet.")
                         .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List(vm.groups) { group in
                         NavigationLink(destination: GroupView(groupId: group.id ?? "")) {
@@ -47,9 +50,12 @@ struct MyGroupsView: View {
                             }
                         }
                     }
+                    .contentMargins(.top, 0, for: .scrollContent)
                 }
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("My Groups")
+            .navigationBarTitleDisplayMode(.inline)
             .task(id: authViewModel.currentUserId) {
                 if let uid = authViewModel.currentUserId {
                     await vm.loadJoinedGroups(userId: uid)
