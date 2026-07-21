@@ -72,6 +72,15 @@ struct EventService {
         try await db.collection("events").document(id).getDocument().data(as: Event.self)
     }
 
+    func fetchRegisteredEvents(userId: String) async throws -> [Event] {
+        let snapshot = try await db.collection("events")
+            .whereField("registeredUserIds", arrayContains: userId)
+            .getDocuments()
+        return snapshot.documents.compactMap { doc in
+            try? doc.data(as: Event.self)
+        }
+    }
+
     func registerForEvent(eventId: String, userId: String) async throws {
         try await db.collection("events").document(eventId).updateData([
             "registeredUserIds": FieldValue.arrayUnion([userId])
