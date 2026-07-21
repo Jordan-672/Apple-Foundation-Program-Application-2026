@@ -45,4 +45,10 @@ class HomeViewModel {
             groups[index].memberIds.append(userId)
         }
     }
+
+    // Same idea, for leaving a group.
+    func markLeft(groupId: String, userId: String) {
+        guard let index = groups.firstIndex(where: { $0.id == groupId }) else { return }
+        groups[index].memberIds.removeAll { $0 == userId }
+    }
 }

@@ -15,45 +15,71 @@ struct EventDetailsView: View {
         _event = State(initialValue: event)
     }
 
+    private var isRegistered: Bool {
+        event.registeredUserIds.contains(authViewModel.currentUserId ?? "")
+    }
+
     var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                AsyncImage(url: URL(string: event.coverImage)) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Image(systemName: "photo")
+                        .font(.system(size: 60))
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity)
+                }
+                .frame(height: 200)
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 16))
 
-        VStack(spacing: 20) {
-            Image(systemName: "person.circle.fill")
-                .font(.system(size: 100))
-                .foregroundColor(.blue)
+                Text(event.title)
+                    .font(.title.bold())
 
-            Text("\(event.title) \(event.startAt.formatted(date: .abbreviated, time: .shortened))")
+                Label(event.location, systemImage: "mappin.and.ellipse")
+                    .foregroundStyle(.secondary)
 
-            HStack {
-                Text("Nationality: ")
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 30, height: 30)
-                    .padding(5)
+                Label(event.startAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
+                    .foregroundStyle(.secondary)
+
+                if !event.description.isEmpty {
+                    Text(event.description)
+                        .font(.body)
+                        .padding(.top, 4)
+                }
+
+                Button {
+                    Task {
+                        if isRegistered {
+                            await authViewModel.performIfLoggedIn(successMessage: "You've cancelled your registration for \(event.title).") {
+                                guard let eventId = event.id, let userId = authViewModel.currentUserId else { return }
+                                try await EventService().unregisterFromEvent(eventId: eventId, userId: userId)
+                                event.registeredUserIds.removeAll { $0 == userId }
                             }
-
-            Spacer()
-
-            Button {
-                Task {
-                    await authViewModel.performIfLoggedIn(successMessage: "You've registered for \(event.title)!") {
-                        guard let eventId = event.id, let userId = authViewModel.currentUserId else { return }
-                        try await EventService().registerForEvent(eventId: eventId, userId: userId)
-                        if !event.registeredUserIds.contains(userId) {
-                            event.registeredUserIds.append(userId)
+                        } else {
+                            await authViewModel.performIfLoggedIn(successMessage: "You've registered for \(event.title)!") {
+                                guard let eventId = event.id, let userId = authViewModel.currentUserId else { return }
+                                try await EventService().registerForEvent(eventId: eventId, userId: userId)
+                                if !event.registeredUserIds.contains(userId) {
+                                    event.registeredUserIds.append(userId)
+                                }
+                            }
                         }
                     }
+                } label: {
+                    Text(isRegistered ? "Registered" : "Join")
+                        .frame(maxWidth: .infinity)
                 }
-            } label: {
-                Text(event.registeredUserIds.contains(authViewModel.currentUserId ?? "") ? "Registered" : "Join")
-                    .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+                .tint(isRegistered ? .gray : .red)
+                .controlSize(.large)
+                .padding(.top, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(event.registeredUserIds.contains(authViewModel.currentUserId ?? "") ? .gray : .red)
-            .disabled(event.registeredUserIds.contains(authViewModel.currentUserId ?? ""))
+            .padding()
         }
-        .padding()
-        .navigationTitle(Text(event.title))
+        .navigationTitle(event.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

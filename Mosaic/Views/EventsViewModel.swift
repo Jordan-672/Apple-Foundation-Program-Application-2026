@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 final class EventsViewModel: ObservableObject {
     @Published var events: [Event] = []
+    @Published var registeredEvents: [Event] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -21,6 +22,16 @@ final class EventsViewModel: ObservableObject {
         defer { isLoading = false }
         do {
             events = try await eventService.fetchEvents()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func loadRegisteredEvents(userId: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            registeredEvents = try await eventService.fetchRegisteredEvents(userId: userId)
         } catch {
             errorMessage = error.localizedDescription
         }
