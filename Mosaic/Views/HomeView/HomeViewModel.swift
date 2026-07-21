@@ -5,24 +5,38 @@
 //  Created by Gahyeon Kim on 21/7/2026.
 //
 
-import Combine
 import Foundation
+import Observation
 
 @MainActor
-final class HomeViewModel: ObservableObject {
-    @Published var groups: [Group] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-
+@Observable
+class HomeViewModel {
+    var groups: [Group] = []
+    var spotlights: [Event] = []
+    var isLoading = false
+    var errorMessage: String?
+    
     private let groupService = GroupService()
-
-    func loadGroups() async {
+    private let spotlightService = SpotlightService()
+    
+    func fetchData() async {
         isLoading = true
-        defer { isLoading = false }
+        errorMessage = nil
+        
         do {
-            groups = try await groupService.fetchGroups()
+            async let groupsTask = groupService.fetchGroups()
+            async let spotlightsTask = spotlightService.fetchSpotlights()
+            
+            groups = try await groupsTask
+            spotlights = try await spotlightsTask
+            
+            print("✅ Fetched \(groups.count) groups")
+            print("✅ Fetched \(spotlights.count) spotlights")
         } catch {
-            errorMessage = error.localizedDescription
+            print("❌ Error fetching data: \(error)")
+            errorMessage = "Failed to load data: \(error.localizedDescription)"
         }
+        
+        isLoading = false
     }
 }

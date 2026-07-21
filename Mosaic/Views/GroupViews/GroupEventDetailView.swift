@@ -49,7 +49,7 @@ struct EventDetailsView: View {
     }
 }
 
-#Preview {
+/*#Preview {
     EventDetailsView(
         event: Event(
             id: "preview",
@@ -65,4 +65,4 @@ struct EventDetailsView: View {
         )
     )
     .environmentObject(AuthViewModel())
-}
+}*/
