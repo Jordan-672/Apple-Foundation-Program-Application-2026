@@ -12,17 +12,17 @@ struct ContentView: View {
 
     var body: some View {
         SwiftUI.Group {
-            if !authViewModel.isLoggedIn {
-                SignInView()
-            } else if authViewModel.needsProfileCompletion {
+            if authViewModel.isLoggedIn && authViewModel.needsProfileCompletion {
                 CompleteProfileView()
             } else {
                 NavigationStack {
                     HomeView()
                         .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Logout") {
-                                    authViewModel.signOut()
+                            if authViewModel.isLoggedIn {
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Button("Logout") {
+                                        authViewModel.signOut()
+                                    }
                                 }
                             }
                         }
@@ -30,6 +30,10 @@ struct ContentView: View {
             }
         }
         .environmentObject(authViewModel)
+        .sheet(isPresented: $authViewModel.showLoginSheet) {
+            SignInView()
+                .environmentObject(authViewModel)
+        }
     }
 }
 

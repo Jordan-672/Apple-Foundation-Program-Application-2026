@@ -8,56 +8,76 @@
 import SwiftUI
 
 struct HomeView: View {
-    var body: some View {
-        VerticalScrollExample()
-    }
-}
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject private var vm = HomeViewModel()
 
-struct VerticalScrollExample: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                ForEach(1...10, id: \.self) { number in
-                    VStack {
-                        
-                        /*Text("GROUP \(number)")
-                            .font(.headline)*/
-                        Spacer()
-                        
-                        CardPattern()
+                if vm.isLoading {
+                    ProgressView("Loading groups...")
+                        .padding()
+                } else if let error = vm.errorMessage {
+                    Text(error)
+                        .foregroundStyle(.red)
+                } else {
+                    ForEach(vm.groups) { group in
+                        GroupCard(group: group) {
+                            Task {
+                                await authViewModel.performIfLoggedIn {
+                                    guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
+                                    try await GroupService().joinGroup(groupId: groupId, userId: userId)
+                                }
+                            }
+                        }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    
-                    /*.background(.white.opacity(0.1))*/
-                    .cornerRadius(12)
                 }
             }
             .padding()
         }
+        .task {
+            await vm.loadGroups()
+        }
     }
 }
 
-struct CardPattern: View {
+struct GroupCard: View {
+    let group: Group
+    let onJoin: () -> Void
+
     var body: some View {
-        VStack() {
-            Image(systemName: "photo")
-                .font(.system(size: 150))
-                .foregroundColor(.gray)
-            
-            Text("Thai Food Enjoyers")
-                .font(.title2)
-                .bold()
-            HStack {
-                Text("Thai Food lovers in ...")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Button("Join") {
-                    // Action will be added later
+        VStack(alignment: .leading, spacing: 8) {
+            NavigationLink(destination: GroupView(groupId: group.id ?? "")) {
+                VStack(alignment: .leading, spacing: 8) {
+                    AsyncImage(url: URL(string: group.coverImage)) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Image(systemName: "photo")
+                            .font(.system(size: 80))
+                            .foregroundColor(.gray)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .frame(height: 150)
+                    .clipped()
+
+                    Text(group.name)
+                        .font(.title2)
+                        .bold()
+                        .foregroundStyle(.primary)
+
+                    Text(group.description)
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
+            }
+            .buttonStyle(.plain)
+
+            HStack {
+                Spacer()
+                Button("Join", action: onJoin)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
             }
         }
         .frame(maxWidth: .infinity)
@@ -69,5 +89,8 @@ struct CardPattern: View {
 }
 
 #Preview {
-    HomeView()
+    NavigationStack {
+        HomeView()
+            .environmentObject(AuthViewModel())
+    }
 }

@@ -12,11 +12,31 @@ import Foundation
 final class AuthViewModel: ObservableObject {
     @Published var isLoggedIn: Bool
     @Published var needsProfileCompletion = false
+    @Published var showLoginSheet = false
     @Published var errorMessage: String?
     @Published var isLoading = false
 
     private let authService = AuthService()
     private let userService = UserService()
+
+    var currentUserId: String? {
+        authService.currentUserId
+    }
+
+    // Used by Join buttons across Home/Group/Event screens: runs the action
+    // if the user is already logged in, otherwise pops the login sheet
+    // instead. Browsing is always open — only these actions require login.
+    func performIfLoggedIn(_ action: () async throws -> Void) async {
+        guard isLoggedIn else {
+            showLoginSheet = true
+            return
+        }
+        do {
+            try await action()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 
     init() {
         isLoggedIn = authService.isLoggedIn
@@ -40,6 +60,7 @@ final class AuthViewModel: ObservableObject {
         do {
             _ = try await authService.signInWithEmail(email: email, password: password)
             isLoggedIn = true
+            showLoginSheet = false
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -52,6 +73,7 @@ final class AuthViewModel: ObservableObject {
         do {
             _ = try await authService.signUpWithEmail(email: email, password: password, firstName: firstName, lastName: lastName, location: location, country: country)
             isLoggedIn = true
+            showLoginSheet = false
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -70,6 +92,7 @@ final class AuthViewModel: ObservableObject {
                 await refreshProfileCompletion(uid: uid)
             }
             isLoggedIn = true
+            showLoginSheet = false
         } catch {
             errorMessage = error.localizedDescription
         }

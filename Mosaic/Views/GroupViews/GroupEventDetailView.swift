@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct EventDetailsView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     var event: Event
-    
+
     var body: some View {
-        
+
         VStack(spacing: 20) {
             Image(systemName: "person.circle.fill")
                 .font(.system(size: 100))
                 .foregroundColor(.blue)
-            
+
             Text("\(event.title) \(event.startAt.formatted(date: .abbreviated, time: .shortened))")
-            
+
             HStack {
                 Text("Nationality: ")
                 Circle()
@@ -26,9 +27,22 @@ struct EventDetailsView: View {
                     .frame(width: 30, height: 30)
                     .padding(5)
                             }
-            
+
             Spacer()
-            
+
+            Button {
+                Task {
+                    await authViewModel.performIfLoggedIn {
+                        guard let eventId = event.id, let userId = authViewModel.currentUserId else { return }
+                        try await EventService().registerForEvent(eventId: eventId, userId: userId)
+                    }
+                }
+            } label: {
+                Text("Join")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
         }
         .padding()
         .navigationTitle(Text(event.title))
@@ -50,4 +64,5 @@ struct EventDetailsView: View {
             priotity: nil
         )
     )
+    .environmentObject(AuthViewModel())
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GroupView: View {
     let groupId: String
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var vm = GroupViewModel()
 
     var body: some View {
@@ -68,7 +69,12 @@ struct GroupView: View {
                     }
 
                     Button {
-                        print("Join community tapped")
+                        Task {
+                            await authViewModel.performIfLoggedIn {
+                                guard let userId = authViewModel.currentUserId else { return }
+                                try await GroupService().joinGroup(groupId: groupId, userId: userId)
+                            }
+                        }
                     } label: {
                         Text("Join the community")
                             .padding()
