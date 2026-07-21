@@ -27,6 +27,15 @@ struct GroupService {
             "memberIds": FieldValue.arrayUnion([userId])
         ])
     }
+
+    func fetchJoinedGroups(userId: String) async throws -> [Group] {
+        let snapshot = try await db.collection("groups")
+            .whereField("memberIds", arrayContains: userId)
+            .getDocuments()
+        return snapshot.documents.compactMap { doc in
+            try? doc.data(as: Group.self)
+        }
+    }
 }
 
 struct EventService {

@@ -15,16 +15,22 @@ struct ContentView: View {
             if authViewModel.isLoggedIn && authViewModel.needsProfileCompletion {
                 CompleteProfileView()
             } else {
-                NavigationStack {
-                    HomeView()
-                        .toolbar {
-                            if authViewModel.isLoggedIn {
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Button("Logout") {
-                                        authViewModel.signOut()
-                                    }
-                                }
-                            }
+                TabView {
+                    NavigationStack {
+                        HomeView()
+                    }
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
+
+                    MyGroupsView()
+                        .tabItem {
+                            Label("My Groups", systemImage: "person.3")
+                        }
+
+                    ProfileView()
+                        .tabItem {
+                            Label("Profile", systemImage: "person.circle")
                         }
                 }
             }
