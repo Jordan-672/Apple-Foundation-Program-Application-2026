@@ -95,12 +95,21 @@ final class SpotlightService {
     private let db = Firestore.firestore()
     
     func fetchSpotlights() async throws -> [Event] {
+        // Fetch all spotlight events without ordering (to avoid needing a Firebase index)
         let snapshot = try await db.collection("events")
             .whereField("spotlight", isEqualTo: true)
-            .order(by: "priority")
             .getDocuments()
-        return snapshot.documents.compactMap { doc in
+        
+        // Convert to Event objects
+        let events = snapshot.documents.compactMap { doc in
             try? doc.data(as: Event.self)
+        }
+        
+        // Sort by priority in-memory (lower numbers first, events without priority go last)
+        return events.sorted { (event1, event2) in
+            let priority1 = event1.priority ?? Int.max
+            let priority2 = event2.priority ?? Int.max
+            return priority1 < priority2
         }
     }
 }
