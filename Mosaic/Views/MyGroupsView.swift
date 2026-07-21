@@ -38,6 +38,12 @@ struct MyGroupsView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(1)
+                                if let userId = authViewModel.currentUserId,
+                                   let joinDate = group.memberJoinDates?[userId] {
+                                    Text("Joined \(joinDate.formatted(date: .abbreviated, time: .omitted))")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }

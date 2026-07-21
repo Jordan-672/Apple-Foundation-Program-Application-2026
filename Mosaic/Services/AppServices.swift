@@ -24,7 +24,8 @@ struct GroupService {
 
     func joinGroup(groupId: String, userId: String) async throws {
         try await db.collection("groups").document(groupId).updateData([
-            "memberIds": FieldValue.arrayUnion([userId])
+            "memberIds": FieldValue.arrayUnion([userId]),
+            "memberJoinDates.\(userId)": FieldValue.serverTimestamp()
         ])
     }
 

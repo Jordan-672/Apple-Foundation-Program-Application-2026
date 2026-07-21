@@ -24,7 +24,8 @@ struct Group: Codable, Identifiable {
     var description: String
     var coverImage: String
     var memberIds: [String]
-    
+    var memberJoinDates: [String: Date]?
+
     var memberCount: Int {memberIds.count}
 }
 
