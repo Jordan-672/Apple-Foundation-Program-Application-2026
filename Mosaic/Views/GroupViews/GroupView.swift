@@ -43,7 +43,7 @@ struct GroupView: View {
 
                                     HStack {
                                         Text(event.location)
-                                        Text(event.startAt)
+                                        Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
                                     }
                                 }
                             }

@@ -18,9 +18,22 @@
 		08A7AE273008873C00FB1514 /* Mosaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mosaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0936F25E300F0B4200CC0334 /* Exceptions for "Mosaic" folder in "Mosaic" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 08A7AE263008873C00FB1514 /* Mosaic */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		08A7AE293008873C00FB1514 /* Mosaic */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0936F25E300F0B4200CC0334 /* Exceptions for "Mosaic" folder in "Mosaic" target */,
+			);
 			path = Mosaic;
 			sourceTree = "<group>";
 		};

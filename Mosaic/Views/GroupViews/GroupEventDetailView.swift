@@ -17,7 +17,7 @@ struct EventDetailsView: View {
                 .font(.system(size: 100))
                 .foregroundColor(.blue)
             
-            Text ("\(event.eventname) \(event.date)")
+            Text("\(event.title) \(event.startAt.formatted(date: .abbreviated, time: .shortened))")
             
             HStack {
                 Text("Nationality: ")
@@ -31,11 +31,23 @@ struct EventDetailsView: View {
             
         }
         .padding()
-        .navigationTitle(Text("\(event.eventname)"))
+        .navigationTitle(Text(event.title))
     }
 }
 
 #Preview {
     EventDetailsView(
-        event: Event (eventname: "DUMPLINGS NIGHT 🥟", nationality: "China 🇨🇳,", date: "29/08/2026"))
+        event: Event(
+            id: "preview",
+            groupId: "preview-group",
+            title: "DUMPLINGS NIGHT 🥟",
+            description: "",
+            location: "",
+            startAt: Date(),
+            coverImage: "",
+            registeredUserIds: [],
+            spotlight: false,
+            priotity: nil
+        )
+    )
 }
