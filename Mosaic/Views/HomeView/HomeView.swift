@@ -22,11 +22,15 @@ struct HomeView: View {
                         .foregroundStyle(.red)
                 } else {
                     ForEach(vm.groups) { group in
-                        GroupCard(group: group) {
+                        GroupCard(
+                            group: group,
+                            isJoined: group.memberIds.contains(authViewModel.currentUserId ?? "")
+                        ) {
                             Task {
-                                await authViewModel.performIfLoggedIn {
+                                await authViewModel.performIfLoggedIn(successMessage: "You've joined \(group.name)!") {
                                     guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
                                     try await GroupService().joinGroup(groupId: groupId, userId: userId)
+                                    vm.markJoined(groupId: groupId, userId: userId)
                                 }
                             }
                         }
@@ -43,6 +47,7 @@ struct HomeView: View {
 
 struct GroupCard: View {
     let group: Group
+    let isJoined: Bool
     let onJoin: () -> Void
 
     var body: some View {
@@ -75,9 +80,10 @@ struct GroupCard: View {
 
             HStack {
                 Spacer()
-                Button("Join", action: onJoin)
+                Button(isJoined ? "Joined" : "Join", action: onJoin)
                     .buttonStyle(.borderedProminent)
-                    .tint(.red)
+                    .tint(isJoined ? .gray : .red)
+                    .disabled(isJoined)
             }
         }
         .frame(maxWidth: .infinity)

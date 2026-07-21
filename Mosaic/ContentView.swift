@@ -23,6 +23,11 @@ struct ContentView: View {
                         Label("Home", systemImage: "house")
                     }
 
+                    EventsView()
+                        .tabItem {
+                            Label("Events", systemImage: "calendar")
+                        }
+
                     MyGroupsView()
                         .tabItem {
                             Label("My Groups", systemImage: "person.3")
@@ -39,6 +44,19 @@ struct ContentView: View {
         .sheet(isPresented: $authViewModel.showLoginSheet) {
             SignInView()
                 .environmentObject(authViewModel)
+        }
+        .alert(
+            authViewModel.successMessage ?? "",
+            isPresented: Binding(
+                get: { authViewModel.successMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        authViewModel.successMessage = nil
+                    }
+                }
+            )
+        ) {
+            Button("OK") {}
         }
     }
 }

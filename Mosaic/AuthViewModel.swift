@@ -13,6 +13,7 @@ final class AuthViewModel: ObservableObject {
     @Published var isLoggedIn: Bool
     @Published var needsProfileCompletion = false
     @Published var showLoginSheet = false
+    @Published var successMessage: String?
     @Published var errorMessage: String?
     @Published var isLoading = false
 
@@ -26,13 +27,16 @@ final class AuthViewModel: ObservableObject {
     // Used by Join buttons across Home/Group/Event screens: runs the action
     // if the user is already logged in, otherwise pops the login sheet
     // instead. Browsing is always open — only these actions require login.
-    func performIfLoggedIn(_ action: () async throws -> Void) async {
+    func performIfLoggedIn(successMessage: String? = nil, _ action: () async throws -> Void) async {
         guard isLoggedIn else {
             showLoginSheet = true
             return
         }
         do {
             try await action()
+            if let successMessage {
+                self.successMessage = successMessage
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

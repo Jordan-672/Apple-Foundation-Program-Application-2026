@@ -9,7 +9,11 @@ import SwiftUI
 
 struct EventDetailsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-    var event: Event
+    @State private var event: Event
+
+    init(event: Event) {
+        _event = State(initialValue: event)
+    }
 
     var body: some View {
 
@@ -32,17 +36,21 @@ struct EventDetailsView: View {
 
             Button {
                 Task {
-                    await authViewModel.performIfLoggedIn {
+                    await authViewModel.performIfLoggedIn(successMessage: "You've registered for \(event.title)!") {
                         guard let eventId = event.id, let userId = authViewModel.currentUserId else { return }
                         try await EventService().registerForEvent(eventId: eventId, userId: userId)
+                        if !event.registeredUserIds.contains(userId) {
+                            event.registeredUserIds.append(userId)
+                        }
                     }
                 }
             } label: {
-                Text("Join")
+                Text(event.registeredUserIds.contains(authViewModel.currentUserId ?? "") ? "Registered" : "Join")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(.red)
+            .tint(event.registeredUserIds.contains(authViewModel.currentUserId ?? "") ? .gray : .red)
+            .disabled(event.registeredUserIds.contains(authViewModel.currentUserId ?? ""))
         }
         .padding()
         .navigationTitle(Text(event.title))

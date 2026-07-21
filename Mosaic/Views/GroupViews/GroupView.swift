@@ -70,18 +70,20 @@ struct GroupView: View {
 
                     Button {
                         Task {
-                            await authViewModel.performIfLoggedIn {
+                            await authViewModel.performIfLoggedIn(successMessage: "You've joined the community!") {
                                 guard let userId = authViewModel.currentUserId else { return }
                                 try await GroupService().joinGroup(groupId: groupId, userId: userId)
+                                vm.markJoined(userId: userId)
                             }
                         }
                     } label: {
-                        Text("Join the community")
+                        Text(group.memberIds.contains(authViewModel.currentUserId ?? "") ? "Joined" : "Join the community")
                             .padding()
                             .foregroundColor(.white)
-                            .background(Color.red)
+                            .background(group.memberIds.contains(authViewModel.currentUserId ?? "") ? Color.gray : Color.red)
                             .cornerRadius(20)
                     }
+                    .disabled(group.memberIds.contains(authViewModel.currentUserId ?? ""))
                 }
             } else {
                 Text("Group not found.")

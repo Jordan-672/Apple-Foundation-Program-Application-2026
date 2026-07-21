@@ -28,4 +28,12 @@ final class GroupViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+
+    // Updates the local copy after a successful join so the button flips to
+    // "Joined" immediately, without needing to refetch.
+    func markJoined(userId: String) {
+        if group != nil && !(group?.memberIds.contains(userId) ?? true) {
+            group?.memberIds.append(userId)
+        }
+    }
 }
