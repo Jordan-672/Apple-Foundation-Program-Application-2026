@@ -90,6 +90,13 @@ struct UserService {
             try? doc.data(as: User.self)
         }
     }
+    
+    func updateUser(id: String, firstName: String, lastName: String) async throws {
+        try await db.collection("users").document(id).updateData([
+            "firstName": firstName,
+            "lastName": lastName
+        ])
+    }
 }
 
 final class SpotlightService {

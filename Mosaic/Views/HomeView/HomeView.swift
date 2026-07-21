@@ -18,11 +18,6 @@ struct HomeView: View {
             TabView {
                 if viewModel.spotlights.isEmpty {
                     // Show placeholder carousels while loading or if no spotlights
-                    Carousel1View()
-                    Carousel2View()
-                    Carousel3View()
-                    Carousel4View()
-                    Carousel5View()
                 } else {
                     ForEach(viewModel.spotlights) { spotlight in
                         SpotlightCarouselView(event: spotlight)
@@ -135,111 +130,60 @@ struct SpotlightCarouselView: View {
     let event: Event
     
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            // Background image
-            if !event.coverImage.isEmpty, let url = URL(string: event.coverImage) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.blue.opacity(0.2)
+        NavigationLink(destination: EventDetailsView(event: event)) {
+            GeometryReader { geometry in
+                ZStack(alignment: .top) {
+                    // Background image - fills entire frame with consistent aspect ratio
+                    if !event.coverImage.isEmpty, let url = URL(string: event.coverImage) {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .clipped()
+                        } placeholder: {
+                            Color.blue.opacity(0.2)
+                        }
+                    } else {
+                        Color.blue.opacity(0.2)
+                    }
+                    
+                    // Gradient overlay for text readability - fixed at top
+                    VStack(spacing: 0) {
+                        LinearGradient(
+                            gradient: Gradient(colors: [.black.opacity(0.7), .clear]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 250)
+                        
+                        Spacer()
+                    }
+                    
+                    // Event info - absolutely positioned from top
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(event.title)
+                            .font(.largeTitle)
+                            .bold()
+                            .foregroundColor(.white)
+                        
+                        Text(event.location)
+                            .font(.title3)
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.8))
+                        
+                        Spacer()
+                    }
+                    .padding(.top, 60) // Fixed distance from top (below status bar/notch)
+                    .padding(.horizontal, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            } else {
-                Color.blue.opacity(0.2)
             }
-            
-            // Gradient overlay for text readability
-            LinearGradient(
-                gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            
-            // Event info
-            VStack(alignment: .leading, spacing: 8) {
-                Text(event.title)
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.white)
-                
-                Text(event.location)
-                    .font(.title3)
-                    .foregroundColor(.white.opacity(0.9))
-                
-                Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
-            }
-            .offset(y: -25)
-            .padding()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-    }
-}
-
-struct Carousel1View: View {
-    var body: some View {
-        ZStack {
-            Color.blue.opacity(0.2)
-            Text("Slide 1")
-                .font(.largeTitle)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-    }
-}
-
-struct Carousel2View: View {
-    var body: some View {
-        ZStack {
-            Color.yellow.opacity(0.2)
-                
-            Text("Slide 2")
-                .font(.largeTitle)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-    }
-}
-
-struct Carousel3View: View {
-    var body: some View {
-        ZStack {
-            Color.green.opacity(0.2)
-                
-            Text("Slide 3")
-                    .font(.largeTitle)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-    }
-}
-
-struct Carousel4View: View {
-    var body: some View {
-        ZStack {
-            Color.yellow.opacity(0.2)
-                
-            Text("Slide 4")
-                .font(.largeTitle)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-    }
-}
-
-struct Carousel5View: View {
-    var body: some View {
-        ZStack {
-            Color.green.opacity(0.2)
-                
-            Text("Slide 5")
-                .font(.largeTitle)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
+        .buttonStyle(.plain)
     }
 }
 

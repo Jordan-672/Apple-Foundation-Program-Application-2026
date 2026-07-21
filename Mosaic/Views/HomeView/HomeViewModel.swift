@@ -39,12 +39,9 @@ class HomeViewModel {
         
         isLoading = false
     }
-
-    // Updates the local copy after a successful join so the card flips to
-    // "Joined" immediately, without needing to refetch the whole list.
+    
     func markJoined(groupId: String, userId: String) {
-        guard let index = groups.firstIndex(where: { $0.id == groupId }) else { return }
-        if !groups[index].memberIds.contains(userId) {
+        if let index = groups.firstIndex(where: { $0.id == groupId }) {
             groups[index].memberIds.append(userId)
         }
     }
