@@ -32,6 +32,12 @@ struct AuthService {
         currentUserId != nil
     }
 
+    // Firebase Auth already tracks this — no need to store our own signup
+    // date in Firestore.
+    var accountCreatedAt: Date? {
+        Auth.auth().currentUser?.metadata.creationDate
+    }
+
     func signInWithEmail(email: String, password: String) async throws -> String {
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
         return result.user.uid
