@@ -36,4 +36,9 @@ final class GroupViewModel: ObservableObject {
             group?.memberIds.append(userId)
         }
     }
+
+    // Same idea, for leaving a group.
+    func markLeft(userId: String) {
+        group?.memberIds.removeAll { $0 == userId }
+    }
 }

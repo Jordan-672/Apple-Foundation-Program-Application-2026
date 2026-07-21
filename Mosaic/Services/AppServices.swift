@@ -29,6 +29,13 @@ struct GroupService {
         ])
     }
 
+    func leaveGroup(groupId: String, userId: String) async throws {
+        try await db.collection("groups").document(groupId).updateData([
+            "memberIds": FieldValue.arrayRemove([userId]),
+            "memberJoinDates.\(userId)": FieldValue.delete()
+        ])
+    }
+
     func fetchJoinedGroups(userId: String) async throws -> [Group] {
         let snapshot = try await db.collection("groups")
             .whereField("memberIds", arrayContains: userId)
@@ -69,6 +76,27 @@ struct EventService {
         try await db.collection("events").document(eventId).updateData([
             "registeredUserIds": FieldValue.arrayUnion([userId])
         ])
+    }
+
+    func unregisterFromEvent(eventId: String, userId: String) async throws {
+        try await db.collection("events").document(eventId).updateData([
+            "registeredUserIds": FieldValue.arrayRemove([userId])
+        ])
+    }
+
+    func createEvent(groupId: String, title: String, description: String, location: String, startAt: Date, coverImage: String) async throws {
+        let event = Event(
+            groupId: groupId,
+            title: title,
+            description: description,
+            location: location,
+            startAt: startAt,
+            coverImage: coverImage,
+            registeredUserIds: [],
+            spotlight: false,
+            priority: nil
+        )
+        _ = try db.collection("events").addDocument(from: event)
     }
 }
 

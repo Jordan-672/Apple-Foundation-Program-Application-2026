@@ -49,15 +49,21 @@ struct HomeView: View {
                         .padding()
                 } else {
                     ForEach(viewModel.groups) { group in
-                        GroupCard(
-                            group: group,
-                            isJoined: group.memberIds.contains(authViewModel.currentUserId ?? "")
-                        ) {
+                        let isJoined = group.memberIds.contains(authViewModel.currentUserId ?? "")
+                        GroupCard(group: group, isJoined: isJoined) {
                             Task {
-                                await authViewModel.performIfLoggedIn(successMessage: "You've joined \(group.name)!") {
-                                    guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
-                                    try await GroupService().joinGroup(groupId: groupId, userId: userId)
-                                    viewModel.markJoined(groupId: groupId, userId: userId)
+                                if isJoined {
+                                    await authViewModel.performIfLoggedIn(successMessage: "You've left \(group.name).") {
+                                        guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
+                                        try await GroupService().leaveGroup(groupId: groupId, userId: userId)
+                                        viewModel.markLeft(groupId: groupId, userId: userId)
+                                    }
+                                } else {
+                                    await authViewModel.performIfLoggedIn(successMessage: "You've joined \(group.name)!") {
+                                        guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
+                                        try await GroupService().joinGroup(groupId: groupId, userId: userId)
+                                        viewModel.markJoined(groupId: groupId, userId: userId)
+                                    }
                                 }
                             }
                         }
@@ -120,7 +126,7 @@ struct GroupCard: View {
                 Button(isJoined ? "Joined" : "Join", action: onJoin)
                     .buttonStyle(.borderedProminent)
                     .tint(isJoined ? .gray : .red)
-                    .disabled(isJoined)
+                    .controlSize(.large)
             }
         }
         .frame(maxWidth: .infinity)
