@@ -4,13 +4,6 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Mosaic uses your location to fill in your profile location during sign up.</string>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIImageName</key>
-		<string>LaunchLogo</string>
-		<key>UIColorName</key>
-		<string>LaunchBackground</string>
-	</dict>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -22,5 +15,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
 </dict>
 </plist>

@@ -22,46 +22,69 @@ struct HomeView: View {
                 Image("LaunchLogo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 120, height: 120)
+                    .frame(width: 80, height: 80)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground))
+                    .ignoresSafeArea()
             } else {
                 ScrollView {
-                    // Spotlight Events Carousel — hidden entirely when there's nothing to show
-                    if !viewModel.spotlights.isEmpty {
-                        TabView {
-                            ForEach(viewModel.spotlights) { spotlight in
-                                SpotlightCarouselView(event: spotlight) {
-                                    selectedSpotlightEvent = spotlight
+                    VStack(spacing: 16) {
+                        // Brand header — sits above the carousel, logo only, centered
+                        Image("LaunchLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
+                            .padding(.top, 4)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .background(Color(.systemGroupedBackground))
+
+                        // Spotlight Events Carousel — hidden entirely when there's nothing to show
+                        if !viewModel.spotlights.isEmpty {
+                            TabView {
+                                ForEach(viewModel.spotlights) { spotlight in
+                                    SpotlightCarouselView(event: spotlight) {
+                                        selectedSpotlightEvent = spotlight
+                                    }
+                                }
+                            }
+                            .tabViewStyle(.page(indexDisplayMode: .automatic))
+                            .frame(height: 260)
+                        }
+
+                        // Groups Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Text("Groups")
+                                    .font(.title3)
+                                    .bold()
+
+                                Spacer()
+
+                                Label("Perth", systemImage: "location.fill")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            if let error = viewModel.errorMessage {
+                                Text(error)
+                                    .foregroundStyle(.red)
+                                    .padding()
+                            } else if viewModel.groups.isEmpty {
+                                Text("No groups available")
+                                    .foregroundColor(.secondary)
+                                    .padding()
+                            } else {
+                                ForEach(viewModel.groups) { group in
+                                    GroupCard(
+                                        group: group,
+                                        isJoined: group.memberIds.contains(authViewModel.currentUserId ?? "")
+                                    )
                                 }
                             }
                         }
-                        .offset(y: -64)
-                        .tabViewStyle(.page(indexDisplayMode: .automatic))
-                        .frame(height: 260)
-                        .ignoresSafeArea()
+                        .padding(.horizontal)
                     }
-
-                    // Groups Section
-                    VStack(spacing: 16) {
-                        if let error = viewModel.errorMessage {
-                            Text(error)
-                                .foregroundStyle(.red)
-                                .padding()
-                        } else if viewModel.groups.isEmpty {
-                            Text("No groups available")
-                                .foregroundColor(.secondary)
-                                .padding()
-                        } else {
-                            ForEach(viewModel.groups) { group in
-                                GroupCard(
-                                    group: group,
-                                    isJoined: group.memberIds.contains(authViewModel.currentUserId ?? "")
-                                )
-                            }
-                        }
-                    }
-                    .offset(y: viewModel.spotlights.isEmpty ? 0 : -64)
-                    .padding()
+                    .padding(.bottom)
                 }
             }
         }
@@ -69,6 +92,8 @@ struct HomeView: View {
         .navigationDestination(item: $selectedSpotlightEvent) { event in
             EventDetailsView(event: event)
         }
+        .toolbar(viewModel.isLoading ? .hidden : .visible, for: .tabBar)
+        .toolbar(.hidden, for: .navigationBar)
         .task {
             await viewModel.fetchData()
         }
@@ -182,7 +207,7 @@ struct SpotlightCarouselView: View {
 
                     Spacer()
                 }
-                .padding(.top, 54) // Fixed distance from top (below status bar/notch)
+                .padding(.top, 20)
                 .padding(.horizontal, 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
