@@ -5,6 +5,7 @@ struct GroupView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var vm = GroupViewModel()
     @State private var showAddEventView = false
+    @State private var showJoinFirstAlert = false
 
     var body: some View {
         NavigationStack {
@@ -74,7 +75,13 @@ struct GroupView: View {
 
                     HStack(spacing: 12) {
                         Button {
-                            showAddEventView = true
+                            if !authViewModel.isLoggedIn {
+                                authViewModel.showLoginSheet = true
+                            } else if !group.memberIds.contains(authViewModel.currentUserId ?? "") {
+                                showJoinFirstAlert = true
+                            } else {
+                                showAddEventView = true
+                            }
                         } label: {
                             HStack {
                                 Text("Create an event")
@@ -134,6 +141,11 @@ struct GroupView: View {
         }
         .task {
             await vm.load(groupId: groupId)
+        }
+        .alert("Join to create an event", isPresented: $showJoinFirstAlert) {
+            Button("OK") {}
+        } message: {
+            Text("You need to join this group before you can create an event.")
         }
         .sheet(isPresented: $showAddEventView) {
             AddEventView(groupId: groupId) {
