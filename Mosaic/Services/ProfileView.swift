@@ -18,14 +18,15 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            SwiftUI.Group {
                 if isLoading {
                     ProgressView("Loading profile...")
-                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let user = user {
-                    VStack(spacing: 24) {
+                    ScrollView {
+                    VStack(spacing: 16) {
                         // Profile Header
-                        VStack(spacing: 16) {
+                        HStack(alignment: .top, spacing: 16) {
                             // Profile Image
                             if !user.profileImage.isEmpty, let url = URL(string: user.profileImage) {
                                 AsyncImage(url: url) { image in
@@ -37,53 +38,67 @@ struct ProfileView: View {
                                         .resizable()
                                         .foregroundColor(.gray)
                                 }
-                                .frame(width: 120, height: 120)
+                                .frame(width: 90, height: 90)
                                 .clipShape(Circle())
                             } else {
                                 Image(systemName: "person.circle.fill")
                                     .resizable()
                                     .foregroundColor(.gray)
-                                    .frame(width: 120, height: 120)
+                                    .frame(width: 90, height: 90)
                             }
-                            
-                            // User Name
-                            Text("\(user.firstName) \(user.lastName)")
-                                .font(.title)
-                                .bold()
-                            
-                            // Location
-                            HStack(spacing: 4) {
-                                Image(systemName: "location.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text("\(user.location), \(user.country)")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                // User Name
+                                Text("\(user.firstName) \(user.lastName)")
+                                    .font(.title2)
+                                    .bold()
+
+                                // Location
+                                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                    Image(systemName: "location.fill")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text(user.location)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                // Joined date
+                                if let createdAt = authViewModel.accountCreatedAt {
+                                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                        Image(systemName: "calendar")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        Text("Joined \(createdAt.formatted(date: .abbreviated, time: .omitted))")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
                             }
+
+                            Spacer()
                         }
-                        .padding(.top, 20)
-                        
-                        Divider()
-                            .padding(.horizontal)
-                        
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(16)
+
                         // Profile Information Section
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Profile Information")
                                 .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 12) {
-                                ProfileInfoRow(icon: "person.fill", title: "First Name", value: user.firstName)
-                                ProfileInfoRow(icon: "person.fill", title: "Last Name", value: user.lastName)
+
+                            VStack(spacing: 4) {
+                                ProfileInfoRow(icon: "person.fill", title: "Name", value: "\(user.firstName) \(user.lastName)")
+                                Divider()
                                 ProfileInfoRow(icon: "mappin.and.ellipse", title: "Location", value: user.location)
+                                Divider()
                                 ProfileInfoRow(icon: "globe", title: "Country", value: user.country)
                             }
-                            .padding(.horizontal)
                         }
-                        
-                        Divider()
-                            .padding(.horizontal)
-                        
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(16)
+
                         // Action Buttons
                         VStack(spacing: 12) {
                             Button {
@@ -99,7 +114,7 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                             }
-                            
+
                             Button(role: .destructive) {
                                 authViewModel.signOut()
                             } label: {
@@ -114,18 +129,31 @@ struct ProfileView: View {
                                 .cornerRadius(12)
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
                     }
+                    .padding()
+                    }
+                    .refreshable {
+                        await loadUserProfile()
+                    }
+                } else if !authViewModel.isLoggedIn {
+                    VStack(spacing: 16) {
+                        Text("Sign in to see your profile")
+                            .foregroundStyle(.secondary)
+                        Button("Sign In") {
+                            authViewModel.showLoginSheet = true
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     VStack(spacing: 16) {
                         Image(systemName: "person.crop.circle.badge.xmark")
                             .font(.system(size: 60))
                             .foregroundColor(.gray)
-                        
+
                         Text("Unable to load profile")
                             .font(.headline)
-                        
+
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .font(.caption)
@@ -133,7 +161,7 @@ struct ProfileView: View {
                                 .multilineTextAlignment(.center)
                                 .padding()
                         }
-                        
+
                         Button("Retry") {
                             Task {
                                 await loadUserProfile()
@@ -141,36 +169,35 @@ struct ProfileView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Profile")
-            .refreshable {
-                await loadUserProfile()
-            }
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showEditSheet) {
                 if let user = user {
-                    EditProfileView(user: user) { updatedFirstName, updatedLastName in
-                        await updateProfile(firstName: updatedFirstName, lastName: updatedLastName)
+                    EditProfileView(user: user) { updatedFirstName, updatedLastName, updatedCountry in
+                        await updateProfile(firstName: updatedFirstName, lastName: updatedLastName, country: updatedCountry)
                     }
                 }
             }
         }
-        .task {
+        .task(id: authViewModel.isLoggedIn) {
             await loadUserProfile()
         }
     }
-    
+
     private func loadUserProfile() async {
         guard let userId = authViewModel.currentUserId else {
             isLoading = false
-            errorMessage = "Not logged in"
+            user = nil
             return
         }
-        
+
         isLoading = true
         errorMessage = nil
-        
+
         do {
             user = try await userService.fetchUser(id: userId)
             isLoading = false
@@ -179,12 +206,12 @@ struct ProfileView: View {
             isLoading = false
         }
     }
-    
-    private func updateProfile(firstName: String, lastName: String) async {
+
+    private func updateProfile(firstName: String, lastName: String, country: String) async {
         guard let userId = authViewModel.currentUserId else { return }
-        
+
         do {
-            try await userService.updateUser(id: userId, firstName: firstName, lastName: lastName)
+            try await userService.updateUser(id: userId, firstName: firstName, lastName: lastName, country: country)
             // Refresh the user data
             await loadUserProfile()
             showEditSheet = false
@@ -213,12 +240,10 @@ struct ProfileInfoRow: View {
                 Text(value)
                     .font(.body)
             }
-            
+
             Spacer()
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
+        .padding(.vertical, 6)
     }
 }
 
@@ -226,36 +251,49 @@ struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var firstName: String
     @State private var lastName: String
+    @State private var country: String
+    @State private var showCountryPicker = false
     @State private var isUpdating = false
-    
+
     let user: User
-    let onSave: (String, String) async -> Void
-    
-    init(user: User, onSave: @escaping (String, String) async -> Void) {
+    let onSave: (String, String, String) async -> Void
+
+    init(user: User, onSave: @escaping (String, String, String) async -> Void) {
         self.user = user
         self.onSave = onSave
         _firstName = State(initialValue: user.firstName)
         _lastName = State(initialValue: user.lastName)
+        _country = State(initialValue: user.country)
     }
-    
+
     var body: some View {
         NavigationStack {
             Form {
                 Section("Personal Information") {
                     TextField("First Name", text: $firstName)
                         .textContentType(.givenName)
-                    
+
                     TextField("Last Name", text: $lastName)
                         .textContentType(.familyName)
                 }
-                
+
                 Section {
                     Text("Location: \(user.location)")
                         .foregroundColor(.secondary)
-                    Text("Country: \(user.country)")
-                        .foregroundColor(.secondary)
+
+                    Button {
+                        showCountryPicker = true
+                    } label: {
+                        HStack {
+                            Text("Country")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text(country)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 } footer: {
-                    Text("Location and country cannot be changed here.")
+                    Text("Location can't be changed here.")
                         .font(.caption)
                 }
             }
@@ -267,12 +305,12 @@ struct EditProfileView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
                             isUpdating = true
-                            await onSave(firstName, lastName)
+                            await onSave(firstName, lastName, country)
                             isUpdating = false
                             dismiss()
                         }
@@ -281,6 +319,9 @@ struct EditProfileView: View {
                 }
             }
             .disabled(isUpdating)
+            .sheet(isPresented: $showCountryPicker) {
+                CountryPicker(selectedCountry: $country)
+            }
         }
     }
 }

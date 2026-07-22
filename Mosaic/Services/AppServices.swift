@@ -128,10 +128,11 @@ struct UserService {
         }
     }
     
-    func updateUser(id: String, firstName: String, lastName: String) async throws {
+    func updateUser(id: String, firstName: String, lastName: String, country: String) async throws {
         try await db.collection("users").document(id).updateData([
             "firstName": firstName,
-            "lastName": lastName
+            "lastName": lastName,
+            "country": country
         ])
     }
 }

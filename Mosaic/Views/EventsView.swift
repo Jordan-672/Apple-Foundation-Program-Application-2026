@@ -20,7 +20,8 @@ struct EventsView: View {
                     Text("My Events").tag(1)
                 }
                 .pickerStyle(.segmented)
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
 
                 if selectedTab == 0 {
                     eventList(vm.events, emptyMessage: "No events yet.")
@@ -33,14 +34,17 @@ struct EventsView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                    .frame(maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     eventList(vm.registeredEvents, emptyMessage: "You haven't registered for any events yet.")
                 }
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Events")
+            .navigationBarTitleDisplayMode(.inline)
             .task {
                 await vm.loadEvents()
+                await vm.loadGroupNames()
             }
             .task(id: selectedTab) {
                 if selectedTab == 1, let uid = authViewModel.currentUserId {
@@ -54,27 +58,47 @@ struct EventsView: View {
     private func eventList(_ events: [Event], emptyMessage: String) -> some View {
         if vm.isLoading {
             ProgressView("Loading events...")
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = vm.errorMessage {
             Text(error)
                 .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if events.isEmpty {
             Text(emptyMessage)
                 .foregroundStyle(.secondary)
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             List(events) { event in
                 NavigationLink(destination: EventDetailsView(event: event)) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(event.title)
-                            .font(.headline)
-                        HStack {
-                            Text(event.location)
-                            Spacer()
-                            Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                    HStack(spacing: 12) {
+                        AsyncImage(url: URL(string: event.coverImage)) { image in
+                            image.resizable().scaledToFill()
+                        } placeholder: {
+                            Image(systemName: "photo")
+                                .foregroundColor(.gray)
                         }
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .frame(width: 56, height: 56)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(event.title)
+                                .fontWeight(.bold)
+
+                            if let groupName = vm.groupNames[event.groupId] {
+                                Text("Hosted by \(groupName)")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Text(event.location)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }

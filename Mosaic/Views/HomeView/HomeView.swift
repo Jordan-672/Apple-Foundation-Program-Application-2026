@@ -11,62 +11,63 @@ import Foundation
 struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var viewModel = HomeViewModel()
-    
+    @State private var selectedSpotlightEvent: Event?
+
     var body: some View {
-        ScrollView {
-            // Spotlight Events Carousel
-            TabView {
-                if viewModel.spotlights.isEmpty {
-                    // Show placeholder carousels while loading or if no spotlights
-                } else {
-                    ForEach(viewModel.spotlights) { spotlight in
-                        SpotlightCarouselView(event: spotlight)
-                    }
-                }
-            }
-            .offset(y: -64)
-            .tabViewStyle(.page(indexDisplayMode: .automatic))
-            .frame(height: 400)
-            .ignoresSafeArea()
-            
-            // Groups Section
-            VStack(spacing: 16) {
-                if viewModel.isLoading {
-                    ProgressView("Loading groups...")
-                        .padding()
-                } else if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundStyle(.red)
-                        .padding()
-                } else if viewModel.groups.isEmpty {
-                    Text("No groups available")
-                        .foregroundColor(.secondary)
-                        .padding()
-                } else {
-                    ForEach(viewModel.groups) { group in
-                        let isJoined = group.memberIds.contains(authViewModel.currentUserId ?? "")
-                        GroupCard(group: group, isJoined: isJoined) {
-                            Task {
-                                if isJoined {
-                                    await authViewModel.performIfLoggedIn(successMessage: "You've left \(group.name).") {
-                                        guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
-                                        try await GroupService().leaveGroup(groupId: groupId, userId: userId)
-                                        viewModel.markLeft(groupId: groupId, userId: userId)
-                                    }
-                                } else {
-                                    await authViewModel.performIfLoggedIn(successMessage: "You've joined \(group.name)!") {
-                                        guard let groupId = group.id, let userId = authViewModel.currentUserId else { return }
-                                        try await GroupService().joinGroup(groupId: groupId, userId: userId)
-                                        viewModel.markJoined(groupId: groupId, userId: userId)
-                                    }
+        SwiftUI.Group {
+            if viewModel.isLoading {
+                // Same logo as the launch screen, so the transition into the
+                // app feels like one continuous moment instead of a jump cut
+                // to a spinner.
+                Image("LaunchLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    // Spotlight Events Carousel — hidden entirely when there's nothing to show
+                    if !viewModel.spotlights.isEmpty {
+                        TabView {
+                            ForEach(viewModel.spotlights) { spotlight in
+                                SpotlightCarouselView(event: spotlight) {
+                                    selectedSpotlightEvent = spotlight
                                 }
                             }
                         }
+                        .offset(y: -64)
+                        .tabViewStyle(.page(indexDisplayMode: .automatic))
+                        .frame(height: 260)
+                        .ignoresSafeArea()
                     }
+
+                    // Groups Section
+                    VStack(spacing: 16) {
+                        if let error = viewModel.errorMessage {
+                            Text(error)
+                                .foregroundStyle(.red)
+                                .padding()
+                        } else if viewModel.groups.isEmpty {
+                            Text("No groups available")
+                                .foregroundColor(.secondary)
+                                .padding()
+                        } else {
+                            ForEach(viewModel.groups) { group in
+                                GroupCard(
+                                    group: group,
+                                    isJoined: group.memberIds.contains(authViewModel.currentUserId ?? "")
+                                )
+                            }
+                        }
+                    }
+                    .offset(y: viewModel.spotlights.isEmpty ? 0 : -64)
+                    .padding()
                 }
             }
-            .offset(y: -64)
-            .padding()
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationDestination(item: $selectedSpotlightEvent) { event in
+            EventDetailsView(event: event)
         }
         .task {
             await viewModel.fetchData()
@@ -86,12 +87,11 @@ struct HomeView: View {
 struct GroupCard: View {
     let group: Group
     let isJoined: Bool
-    let onJoin: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            NavigationLink(destination: GroupView(groupId: group.id ?? "")) {
-                VStack(alignment: .leading, spacing: 8) {
+        NavigationLink(destination: GroupView(groupId: group.id ?? "")) {
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack(alignment: .bottomTrailing) {
                     AsyncImage(url: URL(string: group.coverImage)) { image in
                         image.resizable().scaledToFill()
                     } placeholder: {
@@ -103,95 +103,95 @@ struct GroupCard: View {
                     .frame(height: 150)
                     .clipped()
 
-                    Text(group.name)
-                        .font(.title2)
-                        .bold()
-                        .foregroundStyle(.primary)
-
-                    Text(group.description)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
+                    Image(systemName: isJoined ? "checkmark.circle.fill" : "plus.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, isJoined ? Color.gray : Color.red)
+                        .font(.system(size: 28))
+                        .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
+                        .padding(8)
                 }
-            }
-            .buttonStyle(.plain)
 
-            HStack {
-                Spacer()
-                Button(isJoined ? "Joined" : "Join", action: onJoin)
-                    .buttonStyle(.borderedProminent)
-                    .tint(isJoined ? .gray : .red)
-                    .controlSize(.large)
+                Text(group.name)
+                    .font(.title3)
+                    .bold()
+                    .foregroundStyle(.primary)
+
+                Text(group.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .frame(height: 20, alignment: .topLeading)
             }
         }
+        .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-        .padding()
+        .padding(20)
         .background(Color.white)
         .cornerRadius(12)
-        .shadow(radius: 4)
     }
 }
 
 struct SpotlightCarouselView: View {
     let event: Event
-    
+    let onTap: () -> Void
+
     var body: some View {
-        NavigationLink(destination: EventDetailsView(event: event)) {
-            GeometryReader { geometry in
-                ZStack(alignment: .top) {
-                    // Background image - fills entire frame with consistent aspect ratio
-                    if !event.coverImage.isEmpty, let url = URL(string: event.coverImage) {
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geometry.size.width, height: geometry.size.height)
-                                .clipped()
-                        } placeholder: {
-                            Color.blue.opacity(0.2)
-                        }
-                    } else {
+        GeometryReader { geometry in
+            ZStack(alignment: .top) {
+                // Background image - fills entire frame with consistent aspect ratio
+                if !event.coverImage.isEmpty, let url = URL(string: event.coverImage) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                    } placeholder: {
                         Color.blue.opacity(0.2)
                     }
-                    
-                    // Gradient overlay for text readability - fixed at top
-                    VStack(spacing: 0) {
-                        LinearGradient(
-                            gradient: Gradient(colors: [.black.opacity(0.7), .clear]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: 250)
-                        
-                        Spacer()
-                    }
-                    
-                    // Event info - absolutely positioned from top
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(event.title)
-                            .font(.largeTitle)
-                            .bold()
-                            .foregroundColor(.white)
-                        
-                        Text(event.location)
-                            .font(.title3)
-                            .foregroundColor(.white.opacity(0.9))
-                        
-                        Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
-                            .shadow(radius: 50)
-                        
-                        Spacer()
-                    }
-                    
-                    .padding(.top, 60) // Fixed distance from top (below status bar/notch)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Color.blue.opacity(0.2)
                 }
+
+                // Gradient overlay for text readability - fixed at top
+                VStack(spacing: 0) {
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black.opacity(0.7), .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 140)
+
+                    Spacer()
+                }
+
+                // Event info - absolutely positioned from top
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(event.title)
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.white)
+
+                    Text(event.location)
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.9))
+
+                    Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.8))
+                        .shadow(radius: 50)
+
+                    Spacer()
+                }
+                .padding(.top, 54) // Fixed distance from top (below status bar/notch)
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .buttonStyle(.plain)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap()
+        }
     }
 }
 

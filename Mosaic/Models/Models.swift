@@ -29,7 +29,7 @@ struct Group: Codable, Identifiable {
     var memberCount: Int {memberIds.count}
 }
 
-struct Event: Codable, Identifiable {
+struct Event: Codable, Identifiable, Hashable {
     @DocumentID var id: String?
     var groupId: String
     var title: String

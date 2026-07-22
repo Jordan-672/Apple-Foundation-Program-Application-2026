@@ -24,6 +24,10 @@ final class AuthViewModel: ObservableObject {
         authService.currentUserId
     }
 
+    var accountCreatedAt: Date? {
+        authService.accountCreatedAt
+    }
+
     // Used by Join buttons across Home/Group/Event screens: runs the action
     // if the user is already logged in, otherwise pops the login sheet
     // instead. Browsing is always open — only these actions require login.
