@@ -180,9 +180,11 @@ struct SpotlightCarouselView: View {
                         Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.8))
+                            .shadow(radius: 50)
                         
                         Spacer()
                     }
+                    
                     .padding(.top, 60) // Fixed distance from top (below status bar/notch)
                     .padding(.horizontal, 20)
                     .frame(maxWidth: .infinity, alignment: .leading)
