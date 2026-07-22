@@ -204,6 +204,7 @@ struct SpotlightCarouselView: View {
                     Text(event.startAt.formatted(date: .abbreviated, time: .shortened))
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.8))
+                        .shadow(radius: 50)
 
                     Spacer()
                 }
