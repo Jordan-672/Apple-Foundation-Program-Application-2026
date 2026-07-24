@@ -16,8 +16,7 @@ struct AuthService {
         return result.user.uid
     }
 
-    // Combines signUpWithEmail with createUserProfile so callers can't forget
-    // to create the Firestore profile after an email sign-up.
+    
     func signUpWithEmail(email: String, password: String, firstName: String, lastName: String, location: String, country: String) async throws -> String {
         let uid = try await signUpWithEmail(email: email, password: password)
         try await createUserProfile(uid: uid, firstName: firstName, lastName: lastName, location: location, country: country)
@@ -32,8 +31,6 @@ struct AuthService {
         currentUserId != nil
     }
 
-    // Firebase Auth already tracks this — no need to store our own signup
-    // date in Firestore.
     var accountCreatedAt: Date? {
         Auth.auth().currentUser?.metadata.creationDate
     }
@@ -43,11 +40,7 @@ struct AuthService {
         return result.user.uid
     }
 
-    // isNewUser tells the caller whether this Google account just signed up
-    // for the first time, so the caller knows whether to create a Firestore
-    // profile or skip it for a returning user. firstName/lastName come from
-    // the Google profile so callers don't have to guess how to split a
-    // single display name string.
+
     func signInWithGoogle() async throws -> (uid: String, isNewUser: Bool, firstName: String, lastName: String) {
         guard let rootViewController = await UIApplication.shared.connectedScenes
             .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
@@ -77,18 +70,13 @@ struct AuthService {
         GIDSignIn.sharedInstance.signOut()
     }
 
-    // Call this only right after signUpWithEmail, or after signInWithGoogle
-    // when isNewUser is true. Calling it on every login would overwrite the
-    // user's existing profile data.
+
     func createUserProfile(uid: String, firstName: String, lastName: String, location: String, country: String) async throws {
         let user = User(id: uid, firstName: firstName, lastName: lastName, profileImage: "", location: location, country: country)
         try Firestore.firestore().collection("users").document(uid).setData(from: user)
     }
 
-    // Used to fill in location/country after the fact, e.g. once a Google
-    // sign-up user picks them on the CompleteProfileView screen. Uses merge
-    // instead of updateData so this still works even if the profile
-    // document doesn't exist yet (updateData throws in that case).
+    
     func updateUserLocationCountry(uid: String, location: String, country: String) async throws {
         try await Firestore.firestore().collection("users").document(uid).setData([
             "location": location,

@@ -28,9 +28,7 @@ final class AuthViewModel: ObservableObject {
         authService.accountCreatedAt
     }
 
-    // Used by Join buttons across Home/Group/Event screens: runs the action
-    // if the user is already logged in, otherwise pops the login sheet
-    // instead. Browsing is always open — only these actions require login.
+    
     func performIfLoggedIn(successMessage: String? = nil, _ action: () async throws -> Void) async {
         guard isLoggedIn else {
             showLoginSheet = true
@@ -53,9 +51,6 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
-    // A user "needs completion" if their profile is missing location/country
-    // — true for brand-new Google sign-ups, and for anyone who quit the app
-    // before finishing CompleteProfileView.
     private func refreshProfileCompletion(uid: String) async {
         let profile = try? await userService.fetchUser(id: uid)
         needsProfileCompletion = (profile?.location.isEmpty ?? true) || (profile?.country.isEmpty ?? true)
